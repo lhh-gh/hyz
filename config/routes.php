@@ -14,6 +14,7 @@ use Hyperf\HttpServer\Router\Router;
 
 Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\\Controller\\IndexController@index');
 Router::addRoute(['GET', 'POST', 'HEAD'], '/login', 'App\\Controller\\IndexController@login');
+Router::get('/favicon.ico', 'App\\Controller\\IndexController@favicon');
 
 Router::addServer('ws', function () {
     Router::get('/', 'App\\Controller\\WebSocket\\GameWebSocketController');

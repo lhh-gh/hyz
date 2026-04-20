@@ -11,6 +11,13 @@ use Hyperf\View\RenderInterface;
 
 class IndexController extends AbstractController
 {
+    public function favicon(ResponseInterface $response)
+    {
+        return $response
+            ->withStatus(204)
+            ->withHeader('Content-Type', 'image/x-icon');
+    }
+
     public function index(RenderInterface $render)
     {
         if (! $this->isLogin($this->request)) {

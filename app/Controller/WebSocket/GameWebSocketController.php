@@ -32,16 +32,31 @@ final class GameWebSocketController implements OnOpenInterface, OnMessageInterfa
             return;
         }
 
-        $token = $request->get['token'] ?? $request->cookie['USER_INFO'] ?? null;
+        $query = is_array($request->get ?? null) ? $request->get : [];
+        $cookies = is_array($request->cookie ?? null) ? $request->cookie : [];
+        $token = $query['token'] ?? $cookies['USER_INFO'] ?? null;
+
         if (! is_string($token) || $token === '') {
+            error_log(sprintf(
+                '[ws:onOpen] missing token fd=%d query=%s cookies=%s',
+                $request->fd,
+                json_encode($query, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}',
+                json_encode(array_keys($cookies), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '[]',
+            ));
             $server->disconnect($request->fd);
 
             return;
         }
 
-        $decoded = json_decode($token, true);
+        $decoded = json_decode(urldecode($token), true);
         $account = is_array($decoded) ? (string) ($decoded['account'] ?? '') : '';
         if ($account === '') {
+            error_log(sprintf(
+                '[ws:onOpen] invalid token fd=%d token=%s decoded=%s',
+                $request->fd,
+                $token,
+                json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: 'null',
+            ));
             $server->disconnect($request->fd);
 
             return;
@@ -53,6 +68,7 @@ final class GameWebSocketController implements OnOpenInterface, OnMessageInterfa
         }
 
         $this->connectionManager->bind($request->fd, $account);
+        error_log(sprintf('[ws:onOpen] bind success fd=%d account=%s', $request->fd, $account));
     }
 
     public function onMessage($server, $frame): void
