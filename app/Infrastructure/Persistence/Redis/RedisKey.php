@@ -32,4 +32,14 @@ final class RedisKey
     {
         return "ddz:player:room:{$account}";
     }
+
+    public static function lockRoom(string $roomId): string
+    {
+        return "ddz:lock:room:{$roomId}";
+    }
+
+    public static function lockAccount(string $account): string
+    {
+        return "ddz:lock:account:{$account}";
+    }
 }

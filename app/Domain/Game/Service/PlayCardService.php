@@ -38,6 +38,12 @@ final class PlayCardService
                 'action' => 'pass',
             ];
             $room->currentChairId = $player->chairId >= 3 ? 1 : $player->chairId + 1;
+
+            if ($room->currentChairId === $room->lastPlayedChairId) {
+                $room->lastPlayedCards = null;
+                $room->lastPlayedChairId = null;
+            }
+
             return $room;
         }
 

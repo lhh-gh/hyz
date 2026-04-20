@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\WebSocket;
 
 use App\Application\Gateway\WsRouter;
+use App\Application\Room\DisconnectService;
 use App\Exception\BusinessException;
 use App\Gateway\WebSocket\ConnectionManager;
 use App\Gateway\WebSocket\PacketCodec;
@@ -23,6 +24,7 @@ final class GameWebSocketController implements OnOpenInterface, OnMessageInterfa
         private readonly WsRouter $router,
         private readonly ConnectionManager $connectionManager,
         private readonly WsExceptionResponder $exceptionResponder,
+        private readonly DisconnectService $disconnectService,
     ) {
     }
 
@@ -101,6 +103,14 @@ final class GameWebSocketController implements OnOpenInterface, OnMessageInterfa
 
     public function onClose($server, int $fd, int $reactorId): void
     {
+        $account = $this->connectionManager->getAccountByFd($fd);
+        if ($account !== null) {
+            try {
+                $this->disconnectService->execute($account);
+            } catch (\Throwable $e) {
+                error_log(sprintf('[ws:onClose] disconnect cleanup failed fd=%d account=%s error=%s', $fd, $account, $e->getMessage()));
+            }
+        }
         $this->connectionManager->unbindByFd($fd);
     }
 }

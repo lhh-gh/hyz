@@ -8,6 +8,7 @@ use App\Domain\Game\Entity\Room;
 use App\Domain\Game\Repository\RoomRepositoryInterface;
 use App\Infrastructure\Persistence\Redis\RedisKey;
 use App\Infrastructure\Persistence\Redis\RedisRoomSerializer;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Redis\Redis;
 
 final class RedisRoomRepository implements RoomRepositoryInterface
@@ -15,12 +16,14 @@ final class RedisRoomRepository implements RoomRepositoryInterface
     public function __construct(
         private readonly Redis $redis,
         private readonly RedisRoomSerializer $serializer,
+        private readonly ConfigInterface $config,
     ) {
     }
 
     public function save(Room $room): void
     {
-        $this->redis->set(RedisKey::room($room->roomId), $this->serializer->serialize($room));
+        $ttl = (int) $this->config->get('game.room.snapshot_ttl', 86400);
+        $this->redis->setex(RedisKey::room($room->roomId), $ttl, $this->serializer->serialize($room));
 
         foreach (array_keys($room->players) as $account) {
             $this->bindAccountToRoom((string) $account, $room->roomId);
@@ -49,11 +52,17 @@ final class RedisRoomRepository implements RoomRepositoryInterface
 
     public function bindAccountToRoom(string $account, string $roomId): void
     {
-        $this->redis->set(RedisKey::roomPlayerIndex($account), $roomId);
+        $ttl = (int) $this->config->get('game.room.snapshot_ttl', 86400);
+        $this->redis->setex(RedisKey::roomPlayerIndex($account), $ttl, $roomId);
     }
 
     public function removeAccountRoomBinding(string $account): void
     {
         $this->redis->del(RedisKey::roomPlayerIndex($account));
+    }
+
+    public function delete(string $roomId): void
+    {
+        $this->redis->del(RedisKey::room($roomId));
     }
 }

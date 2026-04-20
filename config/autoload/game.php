@@ -8,6 +8,10 @@ return [
         'room_id_max' => 999999,
         'snapshot_ttl' => 86400,
     ],
+    'lock' => [
+        'ttl' => 5,
+        'retry_max' => 10,
+    ],
     'matchmaking' => [
         'queue_key' => 'ddz:matchmaking:queue',
     ],

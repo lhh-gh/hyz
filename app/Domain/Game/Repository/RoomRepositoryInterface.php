@@ -16,4 +16,6 @@ interface RoomRepositoryInterface
     public function bindAccountToRoom(string $account, string $roomId): void;
 
     public function removeAccountRoomBinding(string $account): void;
+
+    public function delete(string $roomId): void;
 }
