@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b0882214d3c3513a67b5aec1c2ca1f9d",
+    "content-hash": "32eec84a7bf5f0206455d4f437497cab",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -3356,6 +3356,155 @@
                 }
             ],
             "time": "2025-10-30T01:44:44+00:00"
+        },
+        {
+            "name": "hyperf/view",
+            "version": "v3.1.63",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hyperf/view.git",
+                "reference": "f2834083f87f96747ced5ecbfb41ddef98853220"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hyperf/view/zipball/f2834083f87f96747ced5ecbfb41ddef98853220",
+                "reference": "f2834083f87f96747ced5ecbfb41ddef98853220",
+                "shasum": ""
+            },
+            "require": {
+                "hyperf/context": "~3.1.0",
+                "hyperf/contract": "~3.1.0",
+                "hyperf/support": "~3.1.0",
+                "php": ">=8.1",
+                "psr/container": "^1.0 || ^2.0",
+                "swow/psr7-plus": "^1.0"
+            },
+            "suggest": {
+                "duncan3dc/blade": "Required to use blade as a view render engine.",
+                "hyperf/task": "Required to use task as a view render mode.",
+                "league/plates": "Required to use plates as a view render engine.",
+                "smarty/smarty": "Required to use smarty as a view render engine.",
+                "twig/twig": "Required to use twig as a view render engine."
+            },
+            "type": "library",
+            "extra": {
+                "hyperf": {
+                    "config": "Hyperf\\View\\ConfigProvider"
+                },
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hyperf\\View\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A view library for Hyperf.",
+            "homepage": "https://hyperf.io",
+            "keywords": [
+                "hyperf",
+                "php",
+                "swoole",
+                "view"
+            ],
+            "support": {
+                "docs": "https://hyperf.wiki",
+                "issues": "https://github.com/hyperf/hyperf/issues",
+                "pull-request": "https://github.com/hyperf/hyperf/pulls",
+                "source": "https://github.com/hyperf/hyperf"
+            },
+            "funding": [
+                {
+                    "url": "https://hyperf.wiki/#/zh-cn/donate",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://opencollective.com/hyperf",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2025-10-30T01:44:44+00:00"
+        },
+        {
+            "name": "hyperf/view-engine",
+            "version": "v3.1.65",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hyperf/view-engine.git",
+                "reference": "7fe363bbdb109343a59bb224e8beda45a69d0e2b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hyperf/view-engine/zipball/7fe363bbdb109343a59bb224e8beda45a69d0e2b",
+                "reference": "7fe363bbdb109343a59bb224e8beda45a69d0e2b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "hyperf/collection": "~3.1.23",
+                "hyperf/config": "~3.1.0",
+                "hyperf/context": "~3.1.0",
+                "hyperf/contract": "~3.1.0",
+                "hyperf/di": "~3.1.0",
+                "hyperf/event": "~3.1.0",
+                "hyperf/macroable": "~3.1.0",
+                "hyperf/stringable": "~3.1.0",
+                "hyperf/support": "~3.1.0",
+                "hyperf/tappable": "~3.1.0",
+                "hyperf/view": "~3.1.0",
+                "php": ">=8.1"
+            },
+            "suggest": {
+                "hyperf/session": "Required to use ShareErrorsFromSession.",
+                "hyperf/validation": "Required to use ShareErrorsFromSession and ValidationExceptionHandle."
+            },
+            "type": "library",
+            "extra": {
+                "hyperf": {
+                    "config": "Hyperf\\ViewEngine\\ConfigProvider"
+                },
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Functions.php"
+                ],
+                "psr-4": {
+                    "Hyperf\\ViewEngine\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "keywords": [
+                "engine",
+                "hyperf",
+                "php",
+                "view"
+            ],
+            "support": {
+                "issues": "https://github.com/hyperf/view-engine/issues",
+                "source": "https://github.com/hyperf/view-engine/tree/v3.1.65"
+            },
+            "funding": [
+                {
+                    "url": "https://hyperf.wiki/#/zh-cn/donate",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://opencollective.com/hyperf",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2025-12-01T03:37:59+00:00"
         },
         {
             "name": "laminas/laminas-stdlib",
@@ -9389,7 +9538,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.1"
+        "php": ">=8.2"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"
