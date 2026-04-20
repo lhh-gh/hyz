@@ -4,9 +4,9 @@ var Packet = {
         var len = new DataView(buff, 0, 4).getUint32(0);
         var bodyData = new DataView(buff, 4, len);
         var cmd = bodyData.getUint8(0);
-        var scmd = bodyData.getUint8(1);
+        var scmd = bodyData.getUint16(1);
 
-        for (var i = 2; i < bodyData.byteLength; i++) {
+        for (var i = 3; i < bodyData.byteLength; i++) {
             body += String.fromCharCode(bodyData.getUint8(i));
         }
 
@@ -21,16 +21,16 @@ var Packet = {
     msgpack: function (data, cmd, scmd) {
         var dataBuff = msgpack.pack(data);
         var body = String.fromCharCode.apply(null, new Uint8Array(dataBuff));
-        var len = body.length + 6;
+        var len = body.length + 7;
         var buf = new ArrayBuffer(len);
         var view = new DataView(buf, 0, len);
 
-        view.setUint32(0, body.length + 2);
+        view.setUint32(0, body.length + 3);
         view.setUint8(4, cmd);
-        view.setUint8(5, scmd);
+        view.setUint16(5, scmd);
 
         for (var i = 0; i < body.length; i++) {
-            view.setInt8(i + 6, body.charCodeAt(i));
+            view.setInt8(i + 7, body.charCodeAt(i));
         }
 
         return buf;

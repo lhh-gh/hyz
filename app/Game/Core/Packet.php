@@ -47,7 +47,7 @@ class Packet
             } else {
                 $sendStr = $data;
             }
-            return pack('N', strlen($sendStr) + 2) . pack('C2', $cmd, $scmd) . $sendStr;
+            return pack('N', strlen($sendStr) + 3) . pack('Cn', $cmd, $scmd) . $sendStr;
         }
         return self::packFormat('packet type wrong', 100006);
     }
@@ -65,8 +65,8 @@ class Packet
         }
         $len = unpack('Nlen', $header);
         $len = $len['len'];
-        $result = substr($str, 6);
-        if ($len != strlen($result) + 2) {
+        $result = substr($str, 7);
+        if ($len != strlen($result) + 3) {
             //结果长度不对
             return self::packFormat('packet length invalid', 100007);
         }
@@ -78,7 +78,7 @@ class Packet
             //结果长度不对
             return self::packFormat('packet data is empty', 100008);
         }
-        $cmd = unpack('Ccmd/Cscmd', substr($str, 4, 6));
+        $cmd = unpack('Ccmd/nscmd', substr($str, 4, 3));
         $result = self::packFormat('OK', 0, $result);
         $result['cmd'] = $cmd['cmd'];
         $result['scmd'] = $cmd['scmd'];
