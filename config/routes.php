@@ -9,7 +9,11 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 use Hyperf\HttpServer\Router\Router;
+
+Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\\Controller\\IndexController@index');
+Router::addRoute(['GET', 'POST', 'HEAD'], '/login', 'App\\Controller\\IndexController@login');
 
 Router::addServer('ws', function () {
     Router::get('/', 'App\\Controller\\WebSocket\\GameWebSocketController');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support;
 
 use App\Constants\MainCmd;
@@ -18,7 +20,7 @@ final class WsExceptionResponder
     public function respond(Server $server, int $fd, \Throwable $throwable): void
     {
         $code = $throwable instanceof BusinessException ? $throwable->bizCode() : 5000;
-        $message = $throwable instanceof BusinessException ? $throwable->getMessage() : '服务器内部错误';
+        $message = $throwable instanceof BusinessException ? $throwable->getMessage() : 'Internal server error';
 
         $this->pusher->push(
             $server,
@@ -29,7 +31,8 @@ final class WsExceptionResponder
                 'status' => 'fail',
                 'code' => $code,
                 'message' => $message,
-            ]
+                'data' => [],
+            ],
         );
     }
 }

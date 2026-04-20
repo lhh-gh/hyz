@@ -8,6 +8,7 @@ use App\Constants\MainCmd;
 use App\Constants\SubCmd;
 use App\Domain\Game\Repository\RoomRepositoryInterface;
 use App\Domain\Game\Service\PlayCardService;
+use App\Domain\Game\Service\SettlementService;
 use App\Exception\BusinessException;
 use App\Gateway\WebSocket\ConnectionManager;
 use App\Gateway\WebSocket\MessagePusher;
@@ -18,6 +19,7 @@ final class PlayCardAppService
     public function __construct(
         private readonly RoomRepositoryInterface $roomRepository,
         private readonly PlayCardService $playCardService,
+        private readonly SettlementService $settlementService,
         private readonly ConnectionManager $connectionManager,
         private readonly MessagePusher $pusher,
     ) {
@@ -27,14 +29,16 @@ final class PlayCardAppService
     {
         $room = $this->roomRepository->findByAccount($account);
         if ($room === null) {
-            throw new BusinessException('房间不存在', 4302);
+            throw new BusinessException('Room does not exist', 4302);
         }
 
         $room = $this->playCardService->execute($room, $account, $cards, $pass);
         $this->roomRepository->save($room);
 
-        foreach (array_keys($room->players) as $playerAccount) {
-            $fd = $this->connectionManager->getFdByAccount($playerAccount);
+        $actingPlayer = $room->getPlayer($account);
+
+        foreach ($room->players as $player) {
+            $fd = $this->connectionManager->getFdByAccount($player->account);
             if ($fd === null) {
                 continue;
             }
@@ -46,13 +50,50 @@ final class PlayCardAppService
                 SubCmd::SUB_GAME_OUT_CARD_RESP,
                 [
                     'status' => 'success',
-                    'room_id' => $room->roomId,
-                    'current_chair_id' => $room->currentChairId,
-                    'last_played_cards' => $room->lastPlayedCards,
-                    'last_played_chair_id' => $room->lastPlayedChairId,
-                    'game_status' => $room->status->value,
-                ]
+                    'code' => 0,
+                    'message' => $pass ? 'pass success' : 'play success',
+                    'data' => [
+                        'room_id' => $room->roomId,
+                        'account' => $account,
+                        'chair_id' => $actingPlayer->chairId,
+                        'action' => $pass ? 'pass' : 'play',
+                        'cards' => $pass ? [] : $cards,
+                        'current_chair_id' => $room->currentChairId,
+                        'last_played_chair_id' => $room->lastPlayedChairId,
+                        'last_played_cards' => $room->lastPlayedCards,
+                        'left_card_count' => count($actingPlayer->cards),
+                        'room_status' => $room->status->value,
+                        'is_game_over' => $room->status->value === 'finished',
+                    ],
+                ],
             );
+        }
+
+        if ($room->status->value === 'finished') {
+            $settlement = $this->settlementService->build($room, $account);
+
+            foreach ($room->players as $player) {
+                $fd = $this->connectionManager->getFdByAccount($player->account);
+                if ($fd === null) {
+                    continue;
+                }
+
+                $this->pusher->push(
+                    $server,
+                    $fd,
+                    MainCmd::CMD_GAME,
+                    SubCmd::SUB_GAME_SETTLEMENT_RESP,
+                    [
+                        'status' => 'success',
+                        'code' => 0,
+                        'message' => 'game over',
+                        'data' => [
+                            'room_id' => $room->roomId,
+                            ...$settlement,
+                        ],
+                    ],
+                );
+            }
         }
     }
 }

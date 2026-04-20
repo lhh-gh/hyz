@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Game\Handler;
 
-use App\Application\Gateway\WsHandlerInterface;
 use App\Application\Game\CallLandlordAppService;
+use App\Application\Gateway\WsHandlerInterface;
 use App\DTO\WsMessage;
 use Swoole\WebSocket\Server;
 
@@ -17,10 +18,12 @@ final class CallLandlordHandler implements WsHandlerInterface
 
     public function handle(Server $server, WsMessage $message): void
     {
+        $action = (int) ($message->data['action'] ?? $message->data['type'] ?? 0);
+
         $this->service->execute(
             $server,
             (string) $message->account,
-            (int) ($message->data['type'] ?? 0),
+            $action,
         );
     }
 }

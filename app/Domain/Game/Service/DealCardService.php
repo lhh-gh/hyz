@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain\Game\Service;
 
-namespace App\Domain\Game\Service;
-
 use App\Domain\Game\Entity\Room;
 use App\Domain\Game\Enum\RoomStatus;
 use App\Exception\BusinessException;
@@ -21,7 +19,7 @@ final class DealCardService
     public function execute(Room $room): Room
     {
         if (count($room->players) !== 3) {
-            throw new BusinessException('人数不足，无法开始游戏', 4201);
+            throw new BusinessException('Not enough players to start the game', 4201);
         }
 
         $accounts = array_keys($room->players);

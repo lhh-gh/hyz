@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Application\Game;
 
+use App\Domain\Game\Entity\Room;
 use App\Domain\Game\Repository\RoomRepositoryInterface;
 use App\Domain\Game\Service\DealCardService;
-use DomainException;
+use App\Exception\BusinessException;
 
-/**
- *  开局
- */
 final class StartGameService
 {
     public function __construct(
@@ -19,11 +17,11 @@ final class StartGameService
     ) {
     }
 
-    public function execute(string $roomId)
+    public function execute(string $roomId): Room
     {
         $room = $this->roomRepository->find($roomId);
         if ($room === null) {
-            throw new DomainException('房间不存在');
+            throw new BusinessException('Room does not exist', 4303);
         }
 
         $room = $this->dealCardService->execute($room);
