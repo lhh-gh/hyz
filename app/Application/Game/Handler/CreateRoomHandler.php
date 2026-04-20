@@ -31,7 +31,11 @@ final class CreateRoomHandler implements WsHandlerInterface
             SubCmd::CREATE_ROOM_SUCC_RESP,
             [
                 'status' => 'success',
-                'room_id' => $room->roomId,
+                'code' => 0,
+                'message' => 'create room success',
+                'data' => [
+                    'room_id' => $room->roomId,
+                ],
             ]
         );
     }
