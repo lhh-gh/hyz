@@ -12,6 +12,9 @@ use App\Domain\Game\Service\SettlementService;
 use App\Exception\BusinessException;
 use App\Gateway\WebSocket\ConnectionManager;
 use App\Gateway\WebSocket\MessagePusher;
+use App\Infrastructure\Persistence\Redis\RedisKey;
+use App\Infrastructure\Support\DistributedLocker;
+use Hyperf\Contract\ConfigInterface;
 use Swoole\WebSocket\Server;
 
 final class PlayCardAppService
@@ -22,6 +25,8 @@ final class PlayCardAppService
         private readonly SettlementService $settlementService,
         private readonly ConnectionManager $connectionManager,
         private readonly MessagePusher $pusher,
+        private readonly DistributedLocker $locker,
+        private readonly ConfigInterface $config,
     ) {
     }
 
@@ -32,8 +37,19 @@ final class PlayCardAppService
             throw new BusinessException('Room does not exist', 4302);
         }
 
-        $room = $this->playCardService->execute($room, $account, $cards, $pass);
-        $this->roomRepository->save($room);
+        $lockTtl = (int) $this->config->get('game.lock.ttl', 5);
+
+        $room = $this->locker->withLock(RedisKey::lockRoom($room->roomId), function () use ($account, $cards, $pass) {
+            $room = $this->roomRepository->findByAccount($account);
+            if ($room === null) {
+                throw new BusinessException('Room does not exist', 4302);
+            }
+
+            $room = $this->playCardService->execute($room, $account, $cards, $pass);
+            $this->roomRepository->save($room);
+
+            return $room;
+        }, $lockTtl);
 
         $actingPlayer = $room->getPlayer($account);
 
@@ -94,6 +110,11 @@ final class PlayCardAppService
                     ],
                 );
             }
+
+            foreach ($room->players as $player) {
+                $this->roomRepository->removeAccountRoomBinding($player->account);
+            }
+            $this->roomRepository->delete($room->roomId);
         }
     }
 }
