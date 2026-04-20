@@ -17,10 +17,15 @@ final class PacketCodec
             throw new InvalidPacketException((string) ($packet['msg'] ?? '协议解码失败'));
         }
 
+        $data = $packet['data'] ?? [];
+        if ($data instanceof \stdClass) {
+            $data = json_decode(json_encode($data), true);
+        }
+
         return new WsMessage(
             cmd: (int) $packet['cmd'],
             scmd: (int) $packet['scmd'],
-            data: $packet['data'] ?? [],
+            data: is_array($data) ? $data : [],
             fd: $fd,
             account: $account,
         );

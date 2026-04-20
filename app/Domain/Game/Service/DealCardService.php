@@ -22,7 +22,7 @@ final class DealCardService
             throw new BusinessException('Not enough players to start the game', 4201);
         }
 
-        $accounts = array_keys($room->players);
+        $accounts = array_map('strval', array_keys($room->players));
         $deal = $this->ddzPoker->dealCards($accounts);
 
         foreach ($accounts as $account) {

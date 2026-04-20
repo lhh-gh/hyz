@@ -86,6 +86,13 @@ final class GameWebSocketController implements OnOpenInterface, OnMessageInterfa
             $message = $this->codec->decode($frame->data, $frame->fd, $account);
             $this->router->dispatch($server, $message);
         } catch (\Throwable $throwable) {
+            error_log(sprintf(
+                '[ws:onMessage] exception fd=%d class=%s message=%s trace=%s',
+                $frame instanceof Frame ? $frame->fd : 0,
+                get_class($throwable),
+                $throwable->getMessage(),
+                $throwable->getTraceAsString(),
+            ));
             if ($server instanceof Server && $frame instanceof Frame) {
                 $this->exceptionResponder->respond($server, $frame->fd, $throwable);
             }

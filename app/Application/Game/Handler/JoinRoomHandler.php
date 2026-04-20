@@ -108,7 +108,7 @@ final class JoinRoomHandler implements WsHandlerInterface
         $fds = [];
 
         foreach (array_keys($room->players) as $playerAccount) {
-            $fd = $this->connectionManager->getFdByAccount($playerAccount);
+            $fd = $this->connectionManager->getFdByAccount((string) $playerAccount);
             if ($fd !== null) {
                 $fds[] = $fd;
             }

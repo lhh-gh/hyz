@@ -23,7 +23,7 @@ final class RedisRoomRepository implements RoomRepositoryInterface
         $this->redis->set(RedisKey::room($room->roomId), $this->serializer->serialize($room));
 
         foreach (array_keys($room->players) as $account) {
-            $this->bindAccountToRoom($account, $room->roomId);
+            $this->bindAccountToRoom((string) $account, $room->roomId);
         }
     }
 
